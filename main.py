@@ -11,7 +11,7 @@ from ui_main_content import (
 
 def initialize_state():
     if 'exercises' not in st.session_state:
-        st.session_state.exercises = ALL_EXERCISES
+        st.session_state.exercises = ALL_EXERCISES.copy()
     if 'group_per_day' not in st.session_state:
         st.session_state.group_per_day = {}
     if 'exact_series_group' not in st.session_state:
@@ -30,7 +30,9 @@ def initialize_state():
         st.session_state.selected_muscle_groups = []
     if 'optimization_results' not in st.session_state:
         st.session_state.optimization_results = None
-        
+    if 'json_uploader_key' not in st.session_state:
+        st.session_state.json_uploader_key = 0
+
 def clear_results():
     st.session_state.optimization_results = None
 
@@ -58,29 +60,31 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
     )
     st.session_state.optimization_results = (problem, series, penalized)
 
-initialize_state()
-
-# --- Lógica de Carga de Rutina (DEBE IR AL PRINCIPIO) ---
-st.subheader("Cargar Rutina Guardada")
-st.write("Sube un archivo JSON previamente descargado para restaurar tu configuración.")
-uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=["json"])
-
-if uploaded_file is not None:
-    try:
-        loaded_data = json.loads(uploaded_file.read())         
-        for key, value in loaded_data.items():
-            if key == "penalties":
-                st.session_state[key] = {eval(k): v for k, v in value.items()}
-            else:
-                st.session_state[key] = value
-        
-        st.success("Rutina cargada exitosamente. Recargando la página...")
-        st.rerun()
-    except Exception as e:
-        st.error(f"Error al cargar el archivo JSON: {e}")
+initialize_state() 
 
 st.set_page_config(layout="wide")
 st.title("🏋️‍♂️ Optimizador de Rutina de Gimnasio")
+
+st.subheader("Cargar Rutina Guardada")
+st.write("Sube un archivo JSON previamente descargado para restaurar tu configuración.")
+uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=["json"], key=f"json_uploader_{st.session_state.json_uploader_key}")
+
+if uploaded_file is not None:
+    try:
+        loaded_data = json.loads(uploaded_file.read())
+        for key, value in loaded_data.items():
+            if key == "penalties":
+                st.session_state[key] = {eval(k) if isinstance(k, str) and k.startswith('(') and k.endswith(')') else k: v for k, v in value.items()}
+            else:
+                st.session_state[key] = value
+        st.success("Rutina cargada exitosamente.")
+        st.session_state.json_uploader_key += 1
+        st.rerun()
+        
+    except Exception as e:
+        st.error(f"Error al cargar el archivo JSON: {e}")
+
+
 
 all_muscle_groups = sorted(list(set(st.session_state.exercises.values())))
 display_sidebar(all_muscle_groups, on_change_callback=clear_results)

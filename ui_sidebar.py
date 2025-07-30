@@ -56,6 +56,7 @@ def display_sidebar(all_muscle_groups, on_change_callback):
                 st.session_state.group_per_day[day] = st.multiselect(
                     f"Grupos musculares para {day}:",
                     options=st.session_state.selected_muscle_groups,
+                    default=st.session_state.group_per_day.get(day, []),
                     key=f"day_{day}_groups",
                     on_change=on_change_callback,
                     placeholder="Asigna grupos a este día"

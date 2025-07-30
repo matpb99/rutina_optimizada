@@ -170,7 +170,7 @@ def display_results(problem, series, penalized):
             st.session_state.penalties[(e1, e2)] * penalized[(e1, e2, d)].varValue
             for (e1, e2) in st.session_state.penalties
             for d in st.session_state.selected_weeks_day
-            if penalized[(e1, e2, d)].varValue is not None
+            if (e1, e2, d) in penalized and penalized[(e1, e2, d)].varValue is not None
         ])
         total_penalty_value = value(total_penalty_calc)
 

@@ -60,7 +60,7 @@ def run_optimization(
         for d in days:
             problem += penalized[(e1, e2, d)] <= executed[(e1, d)]
             problem += penalized[(e1, e2, d)] <= executed[(e2, d)]
-            problem += penalized[(e1, e2, d)] >= executed[(e1, e2, d)] + executed[(e2, d)] - 1
+            problem += penalized[(e1, e2, d)] >= executed[(e1, d)] + executed[(e2, d)] - 1
 
     problem += lpSum(series[(e, d)] for e in exercises for d in days) - lpSum([
         penalties[(e1, e2)] * penalized[(e1, e2, d)]
