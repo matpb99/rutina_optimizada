@@ -84,15 +84,13 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"Error al cargar el archivo JSON: {e}")
 
-
-
 all_muscle_groups = sorted(list(set(st.session_state.exercises.values())))
 display_sidebar(all_muscle_groups, on_change_callback=clear_results)
 
 with st.expander("💾 Guardar Rutina Actual", expanded=False):
     st.subheader("Guardar Rutina Actual")
     st.write("Descarga tu configuración actual para cargarla más tarde o en otro dispositivo.")
-    
+
     save_data = {
         "exercises": st.session_state.exercises,
         "group_per_day": st.session_state.group_per_day,
@@ -105,7 +103,7 @@ with st.expander("💾 Guardar Rutina Actual", expanded=False):
         "selected_muscle_groups": st.session_state.selected_muscle_groups,
     }
     json_data = json.dumps(save_data, indent=4, ensure_ascii=False)
-    
+
     st.download_button(
         label="Descargar Rutina (JSON)",
         data=json_data,
