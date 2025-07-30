@@ -29,14 +29,6 @@ ALL_EXERCISES = {
     "Curl femoral acostado": "Femoral"
 }
 
-DEFAULT_EXACT_SERIES_VALUE = 8
-
-PENALTY_LEVELS = {
-    "Alto": 5,
-    "Medio": 3,
-    "Bajo": 1
-}
-
 WEEK_DAYS = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
 
 DAY_COLORS = {
@@ -48,3 +40,11 @@ DAY_COLORS = {
     "Sabado": "#00CED1", 
     "Domingo": "#FF69B4" 
 }
+
+PENALTY_LEVELS = {
+    "Alto": 5,
+    "Medio": 3,
+    "Bajo": 1
+}
+
+DEFAULT_EXACT_SERIES_VALUE = 8

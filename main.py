@@ -12,14 +12,23 @@ from ui_main_content import (
 def initialize_state():
     if 'exercises' not in st.session_state:
         st.session_state.exercises = ALL_EXERCISES
+    if 'group_per_day' not in st.session_state:
         st.session_state.group_per_day = {}
+    if 'exact_series_group' not in st.session_state:
         st.session_state.exact_series_group = {}
+    if 'penalties' not in st.session_state:
         st.session_state.penalties = {}
+    if 'max_repetitions_per_exercise_weekly' not in st.session_state:
         st.session_state.max_repetitions_per_exercise_weekly = 1
+    if 'max_series_day_input' not in st.session_state:
         st.session_state.max_series_day_input = 20
+    if 'max_series_grupo_dia_input' not in st.session_state:
         st.session_state.max_series_grupo_dia_input = 8
+    if 'selected_weeks_day' not in st.session_state:
         st.session_state.selected_weeks_day = []
+    if 'selected_muscle_groups' not in st.session_state:
         st.session_state.selected_muscle_groups = []
+    if 'optimization_results' not in st.session_state:
         st.session_state.optimization_results = None
         
 def clear_results():
@@ -49,24 +58,42 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
     )
     st.session_state.optimization_results = (problem, series, penalized)
 
-st.set_page_config(layout="wide")
 initialize_state()
 
+# --- Lógica de Carga de Rutina (DEBE IR AL PRINCIPIO) ---
+st.subheader("Cargar Rutina Guardada")
+st.write("Sube un archivo JSON previamente descargado para restaurar tu configuración.")
+uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=["json"])
+
+if uploaded_file is not None:
+    try:
+        loaded_data = json.loads(uploaded_file.read())         
+        for key, value in loaded_data.items():
+            if key == "penalties":
+                st.session_state[key] = {eval(k): v for k, v in value.items()}
+            else:
+                st.session_state[key] = value
+        
+        st.success("Rutina cargada exitosamente. Recargando la página...")
+        st.rerun()
+    except Exception as e:
+        st.error(f"Error al cargar el archivo JSON: {e}")
+
+st.set_page_config(layout="wide")
 st.title("🏋️‍♂️ Optimizador de Rutina de Gimnasio")
 
 all_muscle_groups = sorted(list(set(st.session_state.exercises.values())))
 display_sidebar(all_muscle_groups, on_change_callback=clear_results)
 
-with st.expander("💾 Guardar/Cargar Rutina", expanded=False):
+with st.expander("💾 Guardar Rutina Actual", expanded=False):
     st.subheader("Guardar Rutina Actual")
     st.write("Descarga tu configuración actual para cargarla más tarde o en otro dispositivo.")
     
-    # Datos a guardar (solo los serializables y relevantes)
     save_data = {
         "exercises": st.session_state.exercises,
         "group_per_day": st.session_state.group_per_day,
         "exact_series_group": st.session_state.exact_series_group,
-        "penalties": {str(k): v for k, v in st.session_state.penalties.items()}, # Convertir tuplas a string para JSON
+        "penalties": {str(k): v for k, v in st.session_state.penalties.items()},
         "max_repetitions_per_exercise_weekly": st.session_state.max_repetitions_per_exercise_weekly,
         "max_series_day_input": st.session_state.max_series_day_input,
         "max_series_grupo_dia_input": st.session_state.max_series_grupo_dia_input,
@@ -81,26 +108,6 @@ with st.expander("💾 Guardar/Cargar Rutina", expanded=False):
         file_name="rutina_optimizada.json",
         mime="application/json"
     )
-
-    st.subheader("Cargar Rutina Guardada")
-    st.write("Sube un archivo JSON previamente descargado para restaurar tu configuración.")
-    uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=["json"])
-    
-    if uploaded_file is not None:
-        try:
-            loaded_data = json.loads(uploaded_file.read())
-            
-            # Actualizar st.session_state con los datos cargados
-            for key, value in loaded_data.items():
-                if key == "penalties": # Convertir strings de vuelta a tuplas
-                    st.session_state[key] = {eval(k): v for k, v in value.items()}
-                else:
-                    st.session_state[key] = value
-            
-            st.success("Rutina cargada exitosamente. Recargando la página...")
-            st.rerun()
-        except Exception as e:
-            st.error(f"Error al cargar el archivo JSON: {e}")
 
 with st.expander("🏋️‍♀️ Gestión de Ejercicios", expanded=True):
     exercises_for_optimization, key_exercises = display_exercise_manager(all_muscle_groups)

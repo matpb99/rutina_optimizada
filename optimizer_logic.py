@@ -49,8 +49,7 @@ def run_optimization(
             problem += lpSum(series[(e, d)] for e in exercises_in_group for d in days) == 0
 
     for e_key in key_exercises:
-        if e_key in exercises:
-            problem += lpSum(executed[(e_key, d)] for d in days) >= 1
+        problem += lpSum(executed[(e_key, d)] for d in days) >= 1
 
     for e in exercises:
         problem += lpSum(executed[(e, d)] for d in days) <= max_repetitions_per_exercise_weekly
@@ -59,10 +58,9 @@ def run_optimization(
 
     for (e1, e2) in penalties:
         for d in days:
-            if e1 in exercises and e2 in exercises:
-                problem += penalized[(e1, e2, d)] <= executed[(e1, d)]
-                problem += penalized[(e1, e2, d)] <= executed[(e2, d)]
-                problem += penalized[(e1, e2, d)] >= executed[(e1, d)] + executed[(e2, d)] - 1
+            problem += penalized[(e1, e2, d)] <= executed[(e1, d)]
+            problem += penalized[(e1, e2, d)] <= executed[(e2, d)]
+            problem += penalized[(e1, e2, d)] >= executed[(e1, e2, d)] + executed[(e2, d)] - 1
 
     problem += lpSum(series[(e, d)] for e in exercises for d in days) - lpSum([
         penalties[(e1, e2)] * penalized[(e1, e2, d)]
