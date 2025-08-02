@@ -32,6 +32,10 @@ def initialize_state():
         st.session_state.optimization_results = None
     if 'json_uploader_key' not in st.session_state:
         st.session_state.json_uploader_key = 0
+    if 'key_exercises' not in st.session_state:
+        st.session_state.key_exercises = []
+    if 'exercises_for_optimization' not in st.session_state:
+        st.session_state.exercises_for_optimization = {}
 
 def clear_results():
     st.session_state.optimization_results = None
@@ -101,6 +105,8 @@ with st.expander("💾 Guardar Rutina Actual", expanded=False):
         "max_series_grupo_dia_input": st.session_state.max_series_grupo_dia_input,
         "selected_weeks_day": st.session_state.selected_weeks_day,
         "selected_muscle_groups": st.session_state.selected_muscle_groups,
+        "key_exercises": st.session_state.get("key_exercises", []),
+        "exercises_for_optimization": st.session_state.get("exercises_for_optimization", {}),
     }
     json_data = json.dumps(save_data, indent=4, ensure_ascii=False)
 
@@ -114,6 +120,7 @@ with st.expander("💾 Guardar Rutina Actual", expanded=False):
 with st.expander("🏋️‍♀️ Gestión de Ejercicios", expanded=True):
     exercises_for_optimization, key_exercises = display_exercise_manager(all_muscle_groups)
     st.session_state.exercises_for_optimization = exercises_for_optimization
+    st.session_state.key_exercises = key_exercises
 
 with st.expander("🚫 Ejercicios Incompatibles (Penalizaciones)", expanded=True):
     display_penalty_manager()
