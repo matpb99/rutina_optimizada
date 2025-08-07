@@ -68,6 +68,6 @@ def run_optimization(
         for d in days
     ])
 
-    problem.solve()
+    status = problem.solve()
 
-    return problem, series, penalized
+    return problem, series, penalized, status

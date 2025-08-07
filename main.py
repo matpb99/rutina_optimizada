@@ -41,17 +41,40 @@ def clear_results():
     st.session_state.optimization_results = None
 
 def handle_optimization_click(exercises_for_optimization, key_exercises):
+    
     if not st.session_state.selected_weeks_day:
-        st.error("Por favor, selecciona al menos un día de entrenamiento.")
-        return
-    if not st.session_state.selected_muscle_groups:
-        st.error("Por favor, selecciona al menos un grupo muscular.")
-        return
-    if not any(st.session_state.group_per_day.values()):
-        st.error("Por favor, asigna al menos un grupo muscular a un día.")
+        st.error("Error: Debes seleccionar al menos un día de entrenamiento.")
         return
 
-    problem, series, penalized = run_optimization(
+    if not st.session_state.selected_muscle_groups:
+        st.error("Error: Debes seleccionar al menos un grupo muscular.")
+        return
+
+    if not any(st.session_state.group_per_day.values()):
+        st.error("Error: Debes asignar al menos un grupo muscular a un día de entrenamiento.")
+        return
+    
+    for day, groups in st.session_state.group_per_day.items():
+        if not groups:
+            continue
+        for group in groups:
+            exercises_in_group = [e for e, g in exercises_for_optimization.items() if g == group]
+            if not exercises_in_group:
+                st.error(f"Error en el día '{day}': El grupo muscular '{group}' está asignado, pero no tiene ningún ejercicio activo. Por favor, activa al menos un ejercicio para este grupo o quítalo del día.")
+                return
+
+    for group, min_series in st.session_state.exact_series_group.items():
+        if min_series <= 0:
+            continue
+        
+        exercises_in_group = [e for e, g in exercises_for_optimization.items() if g == group]
+        max_possible_series = len(exercises_in_group) * st.session_state.max_repetitions_per_exercise_weekly * 4 # Asumiendo 4 series max por ejercicio
+        
+        if max_possible_series < min_series:
+            st.error(f"Error de configuración: El grupo muscular '{group}' tiene un objetivo de {min_series} series semanales, pero con los ejercicios activos y sus límites solo es posible alcanzar un máximo de {max_possible_series} series. Considera activar más ejercicios para este grupo, aumentar las repeticiones semanales o reducir el objetivo de series.")
+            return
+
+    problem, series, penalized, status = run_optimization(
         st.session_state.selected_weeks_day,
         st.session_state.group_per_day,
         exercises_for_optimization,
@@ -62,6 +85,20 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
         st.session_state.max_repetitions_per_exercise_weekly,
         key_exercises,
     )
+
+    if status == -1:
+        st.error("No se pudo generar una rutina con las restricciones actuales. La configuración es demasiado estricta.")
+        st.warning("Sugerencias para solucionar el problema:")
+        st.markdown("""
+        - **Aumenta el máximo de series por día.**
+        - **Reduce el mínimo de series semanales** para algún grupo muscular.
+        - **Activa más ejercicios** para los grupos musculares con objetivos de series altos.
+        - **Revisa las penalizaciones**, podrías tener demasiados ejercicios incompatibles.
+        - **Aumenta las repeticiones máximas semanales** para los ejercicios clave.
+        """)
+        st.session_state.optimization_results = None
+        return
+
     st.session_state.optimization_results = (problem, series, penalized)
 
 initialize_state() 
