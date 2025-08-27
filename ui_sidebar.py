@@ -1,9 +1,11 @@
 import streamlit as st
 from data import DEFAULT_EXACT_SERIES_VALUE, WEEK_DAYS
 
+
 def display_sidebar(all_muscle_groups, on_change_callback):
     st.sidebar.header("⚙️ Configuración de Rutina")
-    st.sidebar.write('Ajusta los parámetros para generar tu rutina personalizada.')
+    st.sidebar.write(
+        'Ajusta los parámetros para generar tu rutina personalizada.')
 
     with st.sidebar.expander("1️⃣ Configuración General", expanded=True):
         st.number_input(
@@ -50,7 +52,8 @@ def display_sidebar(all_muscle_groups, on_change_callback):
     with st.sidebar.expander("3️⃣ Asignación y Series Semanales", expanded=True):
         st.subheader("Asignación de Grupos por Día")
         if not st.session_state.selected_weeks_day:
-            st.info("Selecciona al menos un día de entrenamiento para asignar grupos musculares.")
+            st.info(
+                "Selecciona al menos un día de entrenamiento para asignar grupos musculares.")
         else:
             for day in st.session_state.selected_weeks_day:
                 st.session_state.group_per_day[day] = st.multiselect(
@@ -70,17 +73,18 @@ def display_sidebar(all_muscle_groups, on_change_callback):
                 st.number_input(
                     f"Series exactas para {group}:",
                     min_value=0,
-                    value=st.session_state.exact_series_group.get(group, DEFAULT_EXACT_SERIES_VALUE),
+                    value=st.session_state.exact_series_group.get(
+                        group, DEFAULT_EXACT_SERIES_VALUE),
                     step=1,
                     key=f"exact_series_{group}",
                     on_change=on_change_callback
                 )
-            
+
             new_exact_series = {}
             for group in st.session_state.selected_muscle_groups:
                 widget_key = f"exact_series_{group}"
                 series_value = st.session_state.get(widget_key, 0)
                 if series_value > 0:
                     new_exact_series[group] = series_value
-            
+
             st.session_state.exact_series_group = new_exact_series

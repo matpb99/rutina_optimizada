@@ -9,6 +9,7 @@ from ui_main_content import (
     display_results,
 )
 
+
 def initialize_state():
     if 'exercises' not in st.session_state:
         st.session_state.exercises = ALL_EXERCISES.copy()
@@ -37,11 +38,13 @@ def initialize_state():
     if 'exercises_for_optimization' not in st.session_state:
         st.session_state.exercises_for_optimization = {}
 
+
 def clear_results():
     st.session_state.optimization_results = None
 
+
 def handle_optimization_click(exercises_for_optimization, key_exercises):
-    
+
     if not st.session_state.selected_weeks_day:
         st.error("Error: Debes seleccionar al menos un día de entrenamiento.")
         return
@@ -51,25 +54,31 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
         return
 
     if not any(st.session_state.group_per_day.values()):
-        st.error("Error: Debes asignar al menos un grupo muscular a un día de entrenamiento.")
+        st.error(
+            "Error: Debes asignar al menos un grupo muscular a un día de entrenamiento.")
         return
-    
+
     for day, groups in st.session_state.group_per_day.items():
         if not groups:
             continue
         for group in groups:
-            exercises_in_group = [e for e, g in exercises_for_optimization.items() if g == group]
+            exercises_in_group = [
+                e for e, g in exercises_for_optimization.items() if g == group]
             if not exercises_in_group:
-                st.error(f"Error en el día '{day}': El grupo muscular '{group}' está asignado, pero no tiene ningún ejercicio activo. Por favor, activa al menos un ejercicio para este grupo o quítalo del día.")
+                st.error(
+                    f"Error en el día '{day}': El grupo muscular '{group}' está asignado, pero no tiene ningún ejercicio activo. Por favor, activa al menos un ejercicio para este grupo o quítalo del día.")
                 return
 
     for group, min_series in st.session_state.exact_series_group.items():
         if min_series <= 0:
             continue
-        
-        exercises_in_group = [e for e, g in exercises_for_optimization.items() if g == group]
-        max_possible_series = len(exercises_in_group) * st.session_state.max_repetitions_per_exercise_weekly * 4 # Asumiendo 4 series max por ejercicio
-        
+
+        exercises_in_group = [
+            e for e, g in exercises_for_optimization.items() if g == group]
+        # Asumiendo 4 series max por ejercicio
+        max_possible_series = len(
+            exercises_in_group) * st.session_state.max_repetitions_per_exercise_weekly * 4
+
         if max_possible_series < min_series:
             st.error(f"Error de configuración: El grupo muscular '{group}' tiene un objetivo de {min_series} series semanales, pero con los ejercicios activos y sus límites solo es posible alcanzar un máximo de {max_possible_series} series. Considera activar más ejercicios para este grupo, aumentar las repeticiones semanales o reducir el objetivo de series.")
             return
@@ -87,7 +96,8 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
     )
 
     if status == -1:
-        st.error("No se pudo generar una rutina con las restricciones actuales. La configuración es demasiado estricta.")
+        st.error(
+            "No se pudo generar una rutina con las restricciones actuales. La configuración es demasiado estricta.")
         st.warning("Sugerencias para solucionar el problema:")
         st.markdown("""
         - **Aumenta el máximo de series por día.**
@@ -101,27 +111,30 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
 
     st.session_state.optimization_results = (problem, series, penalized)
 
-initialize_state() 
+
+initialize_state()
 
 st.set_page_config(layout="wide")
 st.title("🏋️‍♂️ Optimizador de Rutina de Gimnasio")
 
 st.subheader("Cargar Rutina Guardada")
 st.write("Sube un archivo JSON previamente descargado para restaurar tu configuración.")
-uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=["json"], key=f"json_uploader_{st.session_state.json_uploader_key}")
+uploaded_file = st.file_uploader("Selecciona un archivo JSON", type=[
+                                 "json"], key=f"json_uploader_{st.session_state.json_uploader_key}")
 
 if uploaded_file is not None:
     try:
         loaded_data = json.loads(uploaded_file.read())
         for key, value in loaded_data.items():
             if key == "penalties":
-                st.session_state[key] = {eval(k) if isinstance(k, str) and k.startswith('(') and k.endswith(')') else k: v for k, v in value.items()}
+                st.session_state[key] = {eval(k) if isinstance(k, str) and k.startswith(
+                    '(') and k.endswith(')') else k: v for k, v in value.items()}
             else:
                 st.session_state[key] = value
         st.success("Rutina cargada exitosamente.")
         st.session_state.json_uploader_key += 1
         st.rerun()
-        
+
     except Exception as e:
         st.error(f"Error al cargar el archivo JSON: {e}")
 
@@ -130,7 +143,8 @@ display_sidebar(all_muscle_groups, on_change_callback=clear_results)
 
 with st.expander("💾 Guardar Rutina Actual", expanded=False):
     st.subheader("Guardar Rutina Actual")
-    st.write("Descarga tu configuración actual para cargarla más tarde o en otro dispositivo.")
+    st.write(
+        "Descarga tu configuración actual para cargarla más tarde o en otro dispositivo.")
 
     save_data = {
         "exercises": st.session_state.exercises,
@@ -155,7 +169,8 @@ with st.expander("💾 Guardar Rutina Actual", expanded=False):
     )
 
 with st.expander("🏋️‍♀️ Gestión de Ejercicios", expanded=True):
-    exercises_for_optimization, key_exercises = display_exercise_manager(all_muscle_groups)
+    exercises_for_optimization, key_exercises = display_exercise_manager(
+        all_muscle_groups)
     st.session_state.exercises_for_optimization = exercises_for_optimization
     st.session_state.key_exercises = key_exercises
 
