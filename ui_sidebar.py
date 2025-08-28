@@ -62,15 +62,12 @@ def display_sidebar(all_muscle_groups, on_change_callback):
             days = st.session_state.selected_weeks_day
             groups = st.session_state.selected_muscle_groups
 
-            # Create a dictionary for the DataFrame data
             data_for_df = {}
             for group in groups:
-                # For each group, create a list of booleans indicating if it's assigned to each day
                 data_for_df[group] = [
                     group in st.session_state.group_per_day.get(day, []) for day in days
                 ]
 
-            # Create the DataFrame with groups as columns and days as index
             assignment_df = pd.DataFrame(data_for_df, index=days)
 
             st.data_editor(

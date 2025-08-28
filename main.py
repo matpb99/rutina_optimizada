@@ -45,11 +45,8 @@ def clear_results():
 
 
 def handle_optimization_click(exercises_for_optimization, key_exercises):
-    # Parse the series editor
     if "series_editor" in st.session_state:
         edited_series_data = st.session_state.series_editor
-        # The error is caused by iterating over a dictionary that represents the widget's
-        # internal state. The corrected code checks if the data is a DataFrame before processing.
         if isinstance(edited_series_data, pd.DataFrame):
             new_exact_series = {
                 row["Grupo Muscular"]: row["Series"]
@@ -58,10 +55,8 @@ def handle_optimization_click(exercises_for_optimization, key_exercises):
             }
             st.session_state.exact_series_group = new_exact_series
 
-    # Parse the day-group assignment editor
     if "day_group_assignment_editor" in st.session_state:
         assignment_data = st.session_state.day_group_assignment_editor
-        # Applying a similar safe handling for the assignment editor.
         if isinstance(assignment_data, pd.DataFrame):
             new_group_per_day = {day: [] for day in assignment_data.index}
             for day, row_data in assignment_data.iterrows():
