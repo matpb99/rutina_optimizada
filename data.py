@@ -26,11 +26,10 @@ ALL_EXERCISES = {
     "Dominadas sin lastre": "Espalda",
     "Hack Squat": "Cuadriceps",
     "Jalon al pecho (agarre abierto)": "Espalda",
-    "Curl femoral acostado": "Femoral"
+    "Curl femoral acostado": "Femoral",
 }
 
-WEEK_DAYS = ["Lunes", "Martes", "Miercoles",
-             "Jueves", "Viernes", "Sabado", "Domingo"]
+WEEK_DAYS = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
 
 DAY_COLORS = {
     "Lunes": "#FF6347",
@@ -39,13 +38,9 @@ DAY_COLORS = {
     "Jueves": "#FFD700",
     "Viernes": "#9370DB",
     "Sabado": "#00CED1",
-    "Domingo": "#FF69B4"
+    "Domingo": "#FF69B4",
 }
 
-PENALTY_LEVELS = {
-    "Alto": 5,
-    "Medio": 3,
-    "Bajo": 1
-}
+PENALTY_LEVELS = {"Alto": 5, "Medio": 3, "Bajo": 1}
 
 DEFAULT_EXACT_SERIES_VALUE = 8
